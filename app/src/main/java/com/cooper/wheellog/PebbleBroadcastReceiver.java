@@ -3,9 +3,7 @@ package com.cooper.wheellog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 
-import com.cooper.wheellog.utils.SettingsUtil;
 import com.getpebble.android.kit.Constants;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
@@ -20,7 +18,6 @@ import java.util.UUID;
 
 import static com.cooper.wheellog.utils.Constants.ACTION_PEBBLE_APP_READY;
 import static com.cooper.wheellog.utils.Constants.ACTION_PEBBLE_APP_SCREEN;
-import static com.cooper.wheellog.utils.Constants.ACTION_REQUEST_KINGSONG_HORN;
 import static com.cooper.wheellog.utils.Constants.INTENT_EXTRA_LAUNCHED_FROM_PEBBLE;
 import static com.cooper.wheellog.utils.Constants.INTENT_EXTRA_PEBBLE_APP_VERSION;
 import static com.cooper.wheellog.utils.Constants.INTENT_EXTRA_PEBBLE_DISPLAYED_SCREEN;
@@ -29,6 +26,7 @@ import static com.cooper.wheellog.utils.Constants.PEBBLE_KEY_DISPLAYED_SCREEN;
 import static com.cooper.wheellog.utils.Constants.PEBBLE_KEY_LAUNCH_APP;
 import static com.cooper.wheellog.utils.Constants.PEBBLE_KEY_PLAY_HORN;
 import static com.cooper.wheellog.utils.Constants.PEBBLE_KEY_READY;
+import static com.cooper.wheellog.utils.HornHelper.horn;
 
 public class PebbleBroadcastReceiver extends BroadcastReceiver {
 
@@ -75,20 +73,7 @@ public class PebbleBroadcastReceiver extends BroadcastReceiver {
                 pebbleScreenIntent.putExtra(INTENT_EXTRA_PEBBLE_DISPLAYED_SCREEN, displayed_screen);
                 context.sendBroadcast(pebbleScreenIntent);
             } else if (data.contains(PEBBLE_KEY_PLAY_HORN)) {
-                int horn_mode = SettingsUtil.getHornMode(context);
-                if (horn_mode == 1) {
-                    final Intent hornIntent = new Intent(ACTION_REQUEST_KINGSONG_HORN);
-                    context.sendBroadcast(hornIntent);
-                } else if (horn_mode == 2) {
-                    MediaPlayer mp = MediaPlayer.create(context, R.raw.bicycle_bell);
-                    mp.start();
-                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            mp.release();
-                        }
-                    });
-                }
+                horn(context);
             }
         }
     }

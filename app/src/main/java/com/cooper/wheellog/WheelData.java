@@ -30,6 +30,10 @@ import timber.log.Timber;
 
 //import android.media.ToneGenerator;
 
+import static com.cooper.wheellog.utils.HornHelper.playBicycleBell;
+
+import static com.cooper.wheellog.utils.HornHelper.playBicycleBell;
+
 public class WheelData {
     private static final int TIME_BUFFER = 10;
     private static WheelData mInstance;
@@ -1377,6 +1381,7 @@ public class WheelData {
                 break;
         }
         mContext.sendBroadcast(intent);
+//        playBluetoothWarning(mContext);
         if (v.hasVibrator() && !mDisablePhoneVibrate)
             v.vibrate(pattern, -1);
         if (!mDisablePhoneBeep) {
@@ -1384,7 +1389,11 @@ public class WheelData {
         }
     }
 
-    void decodeResponse(byte[] data, Context mContext) {
+	private void playBluetoothWarning(Context context) {
+		playBicycleBell(context);
+	}
+
+	void decodeResponse(byte[] data, Context mContext) {
         mDataForLog = true;
         timestamp_raw = System.currentTimeMillis();//new Date(); //sdf.format(new Date());
 

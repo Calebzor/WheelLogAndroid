@@ -69,6 +69,7 @@ import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
 
+import static com.cooper.wheellog.utils.HornHelper.horn;
 import static com.cooper.wheellog.utils.MathsUtil.kmToMiles;
 
 @RuntimePermissions
@@ -281,9 +282,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
-        @Override
+	    private SettingsContentObserver mSettingsContentObserver;
+
+	    @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+	        mSettingsContentObserver = new SettingsContentObserver(mBluetoothLeService ,
+			        new Handler());
+	        getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true,
+			        mSettingsContentObserver);
             if (!mBluetoothLeService.initialize()) {
                 Timber.e(getResources().getString(R.string.error_bluetooth_not_initialised));
                 Toast.makeText(MainActivity.this, R.string.error_bluetooth_not_initialised, Toast.LENGTH_SHORT).show();
@@ -301,6 +308,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             mBluetoothLeService = null;
+	        if (mSettingsContentObserver != null) {
+	            getContentResolver().unregisterContentObserver(mSettingsContentObserver);
+	        }
             finish();
         }
     };
@@ -1344,6 +1354,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         tvRidingTime = (TextView) findViewById(R.id.tvRidingTime);
         tvMode = (TextView) findViewById(R.id.tvMode);
         wheelView = (WheelView) findViewById(R.id.wheelView);
+	    wheelView.setOnClickListener(view -> horn(view.getContext()));
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         tvBmsWaitText = (TextView) findViewById(R.id.tvBmsWaitText);
